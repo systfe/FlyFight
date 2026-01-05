@@ -1,4 +1,6 @@
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManage : MonoBehaviour
@@ -7,7 +9,7 @@ public class GameManage : MonoBehaviour
     private float bg_speed = 2.0f;//背景滚动速度,数值越小速度越快
 
     public int score = 0;//分数
-    public GameObject gameover;
+    public GameOver gameover;
     public Text score_txt;//分数文本对象
     public Text hp_txt;
     public Text bulletnum_txt;
@@ -21,12 +23,13 @@ public class GameManage : MonoBehaviour
 
     public AudioSource bgm_source;
 
+    public PlayerControl Player;
+
     private void Start()
     {
         background = GameObject.Find("BG");//获取背景对象
         enemys = Resources.LoadAll<GameObject>("Enemys");//加载所有敌机预制体
         InvokeRepeating("Create_Enemys", 0, 1.0f);
-        gameover.SetActive(false);
 
         // 初始化并播放 BGM（如果已设置）
         if (bgm_clip != null)
@@ -44,12 +47,11 @@ public class GameManage : MonoBehaviour
     {
         background.GetComponent<Renderer>().material.SetTextureOffset("_MainTex", new Vector2(0f, Time.time / bg_speed));
         score_txt.text = "Score: " + score.ToString();
-        GameObject player = GameObject.FindWithTag("Player");
-        if (player != null)
+
+        if (Player != null)
         {
-            PlayerControl pc = player.GetComponent<PlayerControl>();
-            hp_txt.text = "HP: " + pc.hp.ToString();
-            bulletnum_txt.text = pc.bullet_num.ToString();
+            hp_txt.text = "HP: " + Player.hp.ToString();
+            bulletnum_txt.text = Player.bullet_num.ToString();
         }
     }
 
@@ -73,7 +75,8 @@ public class GameManage : MonoBehaviour
 
     public void Game_Over()
     {
-        gameover.SetActive(true);
+        gameover.Game_End("本局得分: " + score.ToString());
+
         Time.timeScale = 0f;
 
         bgm_source.Stop();

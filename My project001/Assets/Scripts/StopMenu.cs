@@ -12,7 +12,8 @@ public class StopMenu : MonoBehaviour
     {
         stop_menu.SetActive(false);
 
-        pauseButton.GetComponentInChildren<Text>().text = "||";
+        if (pauseButton != null)
+            pauseButton.GetComponentInChildren<Text>().text = "||";
     }
 
     private void Update()
@@ -38,7 +39,13 @@ public class StopMenu : MonoBehaviour
         //暂停音乐
         GameManage gm = GameObject.Find("GameManage").GetComponent<GameManage>();
         gm.bgm_source.Pause();
-        pauseButton.GetComponentInChildren<Text>().text = "|>";
+
+        if (pauseButton != null)
+        {
+            pauseButton.GetComponentInChildren<Text>().text = "|>";
+            // 隐藏暂停按钮界面元素
+            pauseButton.gameObject.SetActive(false);
+        }
     }
 
     public void Game_Continue()//继续游戏
@@ -47,7 +54,20 @@ public class StopMenu : MonoBehaviour
         stop_menu.SetActive(false);
         GameManage gm = GameObject.Find("GameManage").GetComponent<GameManage>();
         gm.bgm_source.UnPause();
-        pauseButton.GetComponentInChildren<Text>().text = "||";
+
+        if (pauseButton != null)
+        {
+            // 恢复并更新文本
+            pauseButton.gameObject.SetActive(true);
+            pauseButton.GetComponentInChildren<Text>().text = "||";
+        }
+    }
+
+    public void Begins_Again()
+    {
+        Time.timeScale = 0f;
+        SceneManager.LoadScene("Play");
+        Time.timeScale = 1f;
     }
 
     public void Return_Start()
