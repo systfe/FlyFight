@@ -197,11 +197,12 @@ public class PlayerControl : MonoBehaviour
         if (hp <= 0)
         {
             hp = 0;
-            Destroy(gameObject);//销毁玩家对象
+            //Destroy(gameObject);//销毁玩家对象
 
             //播放爆炸特效
             //GameObject explosion_prefab = Resources.Load<GameObject>("ExplosionEffect");
             //Instantiate(explosion_prefab, transform.position, Quaternion.identity);
+
             GameObject.Find("GameManage").SendMessage("Game_Over", SendMessageOptions.DontRequireReceiver);
         }
         else

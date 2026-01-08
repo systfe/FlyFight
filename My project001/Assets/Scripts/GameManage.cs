@@ -1,6 +1,4 @@
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManage : MonoBehaviour
@@ -9,6 +7,7 @@ public class GameManage : MonoBehaviour
     private float bg_speed = 2.0f;//背景滚动速度,数值越小速度越快
 
     public int score = 0;//分数
+    public Button pause_button;
     public GameOver gameover;
     public Text score_txt;//分数文本对象
     public Text hp_txt;
@@ -53,6 +52,7 @@ public class GameManage : MonoBehaviour
             hp_txt.text = "HP: " + Player.hp.ToString();
             bulletnum_txt.text = Player.bullet_num.ToString();
         }
+        //ESC键暂停/继续游戏
     }
 
     private void Create_Enemys()
@@ -76,7 +76,7 @@ public class GameManage : MonoBehaviour
     public void Game_Over()
     {
         gameover.Game_End("本局得分: " + score.ToString());
-
+        pause_button.gameObject.SetActive(false);
         Time.timeScale = 0f;
 
         bgm_source.Stop();

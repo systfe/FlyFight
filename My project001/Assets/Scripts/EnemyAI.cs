@@ -100,8 +100,8 @@ public class EnemyAI : MonoBehaviour
         }
         else if (collision.tag == "Player")
         {
-            collision.SendMessage("Damage", 90, SendMessageOptions.DontRequireReceiver);
             GameObject.Find("GameManage").SendMessage("Set_Score", 10, SendMessageOptions.DontRequireReceiver);
+            collision.SendMessage("Damage", 90, SendMessageOptions.DontRequireReceiver);
             Destroy(gameObject);
         }
     }
