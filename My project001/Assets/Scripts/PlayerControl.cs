@@ -8,12 +8,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(BoxCollider2D))]//请求添加碰撞盒组件
-public class PlayerControl : MonoBehaviour
+public class PlayerControl : Plane
 {
-    public int hp = 100;
-    public int bullet_num = 1000;
-    public GameObject bullet_prefab;
-    private Transform[] firepos;
+    public int bullet_num = 100;
     public AudioClip clips;
 
     // 平滑跟随参数
@@ -30,15 +27,18 @@ public class PlayerControl : MonoBehaviour
     public Image rak_image;
 
     // Start is called before the first frame update
-    private void Start()
+    protected new void Start()
     {
-        bullet_prefab = Resources.Load<GameObject>("BoobBullet");//加载子弹预制体
-        GetFire_pos(3);
+        fp_num = 3;
+        bullet_type = "BoobBullet";
+        name = "Player";
+        base.Start();
+
         targetpos = transform.position;
         //十秒回5点血
         InvokeRepeating(nameof(FBH), 10f, 10f);
         nomal_attack = new Ability(KeyCode.Space, 0.2f, ak_image);
-        range_attack = new Ability(KeyCode.Q, 10f, rak_image);
+        range_attack = new Ability(KeyCode.Q, 0.1f, rak_image);
     }
 
     // Update is called once per frame
@@ -99,19 +99,9 @@ public class PlayerControl : MonoBehaviour
 #endif
     }
 
-    private void Attack()//普通攻击
+    private new void Attack()//普通攻击
     {
-        if (bullet_num == 0 || bullet_prefab == null || firepos == null || firepos.Length == 0) return;
-        // 对每个发射口生成一颗子弹
-        foreach (var fp in firepos)
-        {
-            if (fp == null) continue;
-            GameObject temp_bullet = Instantiate(bullet_prefab, fp.position, fp.rotation);//在发射口位置生成子弹
-            temp_bullet.AddComponent<BulletControl>();//给子弹添加脚本组件
-            temp_bullet.name = "PlayerBullet";//命名子弹对象
-
-            Ammunition();//减少子弹数量
-        }
+        base.Attack();
         AudioSource.PlayClipAtPoint(clips, targetpos, 0.5f);//播放音效
     }
 
@@ -123,60 +113,16 @@ public class PlayerControl : MonoBehaviour
         float angle = spread_angle / (num - 1);
         for (int i = -num / 2; i < num / 2 + 1; i++)
         {
-            GameObject temp_bullet = Instantiate(bullet_prefab, firepos[0].position, firepos[0].rotation);
-            temp_bullet.transform.Rotate(0, 0, angle * i);
-            temp_bullet.AddComponent<BulletControl>();//给子弹添加脚本组件
-            temp_bullet.name = "PlayerBullet";
-            Ammunition();
+            GameObject tb = Fire(firepos[0]);
+            tb.transform.Rotate(0, 0, angle * i);
         }
         AudioSource.PlayClipAtPoint(clips, firepos[0].position, 1.0f);
     }
 
-    private void Ammunition(int b = -1)
-    { bullet_num = (bullet_num > 0) ? bullet_num + b : 0; }
-
-    public void GetFire_pos(int pos = -1)
+    private GameObject Fire(Transform fp, int bn = -1)
     {
-        // 如果 Inspector 未指定发射口，则自动收集所有子Transform作为发射口
-        if (firepos == null || firepos.Length == 0)
-        {
-            int cnt = (pos == -1) ? transform.childCount : pos;
-            firepos = new Transform[cnt];
-            // 指定数量的发射口
-            //1->0;2->1,2;3->0,1,2;
-            switch (pos)
-            {
-                case -1:
-                    for (int i = 0; i < cnt; i++) firepos[i] = transform.GetChild(i);
-                    break;
-
-                case 3:
-                    firepos[0] = transform.GetChild(0);
-                    firepos[1] = transform.GetChild(1);
-                    firepos[2] = transform.GetChild(2);
-                    break;
-
-                case 2:
-                    firepos[0] = transform.GetChild(1);
-                    firepos[1] = transform.GetChild(2);
-                    break;
-
-                case 1:
-                    firepos[0] = transform.GetChild(0);
-                    break;
-
-                case 0:
-                default:
-                    break;
-            }
-        }
-
-        if (firepos == null || firepos.Length == 0)
-        {
-            // 没有发射口就不再重复调用 Attack
-            CancelInvoke(nameof(Attack));
-            return;
-        }
+        bullet_num = (bullet_num > 0) ? bullet_num + bn : 0;
+        return base.Fire(fp);
     }
 
     private void FBH()
@@ -191,12 +137,11 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
-    private void Damage(int damage)//受到伤害
+    public new bool Damage(int damage)//受到伤害
     {
-        if (hp > 0) hp -= damage;
-        if (hp <= 0)
+        bool die = base.Damage(damage);
+        if (die)
         {
-            hp = 0;
             //Destroy(gameObject);//销毁玩家对象
 
             //播放爆炸特效
@@ -207,7 +152,7 @@ public class PlayerControl : MonoBehaviour
         }
         else
         {
-            // 可以添加受伤反馈效果，如闪烁等
         }
+        return die;
     }
 }

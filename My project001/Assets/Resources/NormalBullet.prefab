@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5588396937721550100}
   - component: {fileID: 8262473961925741146}
   m_Layer: 0
-  m_Name: NomalBullet
+  m_Name: NormalBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

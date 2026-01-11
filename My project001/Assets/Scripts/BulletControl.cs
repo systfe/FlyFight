@@ -24,7 +24,7 @@ public class BulletControl : MonoBehaviour
         switch (other.tag)
         {
             case "Player":
-                if (this.name == "EnemyBullet")
+                if (this.name.Contains("Enemy-"))
                 {
                     other.SendMessage("Damage", 20, SendMessageOptions.DontRequireReceiver);
 
@@ -33,7 +33,7 @@ public class BulletControl : MonoBehaviour
                 break;
 
             case "Enemy":
-                if (this.name == "PlayerBullet")
+                if (this.name.Contains("Player-"))
                 {
                     // 如果被击中的对象是敌机，并且被这次伤害击毁，则加分
                     var enemy = other.GetComponent<EnemyAI>();//尝试获取敌机脚本组件

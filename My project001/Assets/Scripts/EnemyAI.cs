@@ -1,53 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]//请求添加碰撞盒组件
 [RequireComponent(typeof(Rigidbody2D))]
-public class EnemyAI : MonoBehaviour
+public class EnemyAI : Plane
 {
-    public int hp = 100;
     public float enemy_speed;
 
-    [SerializeField]
-    private Transform[] firepos; // 支持在 Inspector 指定多个发射口
-
-    private GameObject bullet_prefab;
-
-    // 闪烁效果（亮度变化）相关
-
     // Start is called before the first frame update
-    private void Start()
+    private new void Start()
     {
-        bullet_prefab = Resources.Load<GameObject>("NomalBullet");//加载子弹预制体
+        bullet_type = "NormalBullet";
+        name = "Enemy";
+        base.Start();
         GetComponent<BoxCollider2D>().isTrigger = true;
         GetComponent<Rigidbody2D>().gravityScale = 0;
 
-        GetFire_pos();
-
-        InvokeRepeating("Attack", 0, 1.0f);
+        InvokeRepeating(nameof(Attack), 0, 1.0f);
     }
 
     // Update is called once per frame
     private void Update()
     {
         transform.Translate(Vector3.down * Time.deltaTime * enemy_speed);
-    }
-
-    private void Attack()
-    {
-        if (bullet_prefab == null || firepos == null || firepos.Length == 0)
-            return;
-
-        // 对每个发射口生成一颗子弹
-        foreach (var fp in firepos)
-        {
-            if (fp == null) continue;
-            GameObject temp_bullet = Instantiate(bullet_prefab, fp.position, fp.rotation);
-
-            temp_bullet.AddComponent<BulletControl>();//给子弹添加脚本组件
-            temp_bullet.name = "EnemyBullet";
-        }
     }
 
     public void GetFire_pos(int pos = -1)
@@ -106,19 +80,16 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    public bool Damage(int damage)//受到伤害
+    public new bool Damage(int damage)//受到伤害
     {
-        if (hp > 0) hp -= damage;
-        if (hp <= 0)
+        bool die = base.Damage(damage);
+        if (die)
         {
-            hp = 0;
             Destroy(gameObject);
-            return true;
         }
         else
         {
-            //TODO: 发光一下
-            return false;
         }
+        return die;
     }
 }
