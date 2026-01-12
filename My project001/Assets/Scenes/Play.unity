@@ -856,9 +856,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52dac9343afd02e4cbb09d6aec2a4d16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  score: 0
   pause_button: {fileID: 1330764766}
-  gameover: {fileID: 1047210585}
+  score: 0
   score_txt: {fileID: 325790594}
   hp_txt: {fileID: 12980872}
   bulletnum_txt: {fileID: 781166790}
@@ -867,6 +866,7 @@ MonoBehaviour:
   bgm_volume: 0.12
   bgm_source: {fileID: 0}
   Player: {fileID: 1977292337}
+  gameover: {fileID: 1047210585}
 --- !u!1 &908790374
 GameObject:
   m_ObjectHideFlags: 0
@@ -2955,9 +2955,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1cf9fae3b2618d4b9869070d8a9d546, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 100
-  bullet_num: 50000
-  bullet_prefab: {fileID: 8728389468437282168, guid: 99ce1851480e29c4aa5a9a0078f86c47, type: 3}
+  hp_max: 0
+  hp: 1
+  bullet_type: 
+  fp_num: -1
+  bullet_num: 100
   clips: {fileID: 8300000, guid: a93bf0e7c10fdab43b9aea8f04b4a9c2, type: 3}
   ak_image: {fileID: 0}
   rak_image: {fileID: 0}

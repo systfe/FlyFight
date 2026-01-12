@@ -5,7 +5,11 @@
 5.gameover添加本局得分
 6.修复了暂停和gameover时暂停按钮显示的问题
 7.项目名PlaneFight更名FlyFight
-﻿8.修复了暂停时esc无法继续游戏的问题。
-9.修复了gameover时最后得分和得分不一致的问题。
+﻿8.修复了暂停时esc无法继续游戏的问题
+9.修复了gameover时最后得分和得分不一致的问题
 10.暂停按钮变为菜单图标
 11.新建Plane父类,用oop简化敌机和玩家的代码
+12.修改Enemy类,新增spy和fighter类分别对应两种机型并继承Enemy类,并微调数值
+13.修改Bullet类,新增normal和boob类分别对应两种子弹并继承bullet类,并微调数值
+14.优化player的子弹挂载及消耗,修复了player攻击不消耗子弹的问题
+15.添加受击特效,血量上限

@@ -5,7 +5,10 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]//请求添加碰撞盒组件
 public class Plane : MonoBehaviour
 {
-    public int hp = 100;
+    private SpriteRenderer spriteRenderer;
+    private Material default_material;
+    public float hp_max;
+    public float hp;
     public string bullet_type;
     protected GameObject bullet_prefab;
 
@@ -15,6 +18,9 @@ public class Plane : MonoBehaviour
     // Start is called before the first frame update
     protected void Start()
     {
+        hp = hp_max;
+        spriteRenderer = GetComponent<SpriteRenderer>(); // 获取SpriteRenderer组件
+        default_material = spriteRenderer.material;
         bullet_prefab = Resources.Load<GameObject>(bullet_type);//加载子弹预制体
         GetFire_pos();
     }
@@ -26,8 +32,7 @@ public class Plane : MonoBehaviour
 
     protected void Attack()
     {
-        if (bullet_prefab == null || firepos == null || firepos.Length == 0)
-            return;
+        if (bullet_prefab == null || firepos == null || firepos.Length == 0) return;
 
         // 对每个发射口生成一颗子弹
         foreach (var fp in firepos)
@@ -39,8 +44,7 @@ public class Plane : MonoBehaviour
     protected GameObject Fire(Transform fp)
     {
         GameObject temp_bullet = Instantiate(bullet_prefab, fp.position, fp.rotation);
-        temp_bullet.AddComponent<BulletControl>();//给子弹添加脚本组件
-        temp_bullet.name = name + '-' + bullet_type;
+        temp_bullet.name = tag + '-' + bullet_type;
         return temp_bullet;
     }
 
@@ -54,7 +58,6 @@ public class Plane : MonoBehaviour
             switch (fp_num)
             {
                 case -1:
-                    Debug.Log("never gonna give you up");
                     for (int i = 0; i < cnt; i++) firepos[i] = transform.GetChild(i);
                     break;
 
@@ -75,19 +78,24 @@ public class Plane : MonoBehaviour
 
                 case 0:
                 default:
+                    CancelInvoke(nameof(Attack));
                     break;
             }
         }
-
-        if (firepos == null || firepos.Length == 0)
-        {
-            // 没有发射口就不再重复调用 Attack
-            CancelInvoke(nameof(Attack));
-            return;
-        }
     }
 
-    public bool Damage(int damage)//受到伤害
+    private IEnumerator FlashEffect()
+    {
+        float flashDuration = 0.08f;
+
+        yield return new WaitForSeconds(flashDuration);
+        spriteRenderer.material = Resources.Load<Material>("Material/FlashFXMaterial");
+        yield return new WaitForSeconds(flashDuration);
+
+        spriteRenderer.material = default_material;
+    }
+
+    public bool Damage(float damage)//受到伤害
     {
         if (hp > 0) hp -= damage;
         if (hp <= 0)
@@ -98,6 +106,7 @@ public class Plane : MonoBehaviour
         else
         {
             //TODO: 发光一下
+            StartCoroutine(FlashEffect());
             return false;
         }
     }

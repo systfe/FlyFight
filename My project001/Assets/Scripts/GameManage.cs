@@ -6,10 +6,13 @@ public class GameManage : MonoBehaviour
     private GameObject background;//背景对象
     private float bg_speed = 2.0f;//背景滚动速度,数值越小速度越快
 
-    public int score = 0;//分数
     public Button pause_button;
-    public GameOver gameover;
-    public Text score_txt;//分数文本对象
+
+    //分数文本对象
+    public int score = 0;//分数
+
+    public Text score_txt;
+
     public Text hp_txt;
     public Text bulletnum_txt;
 
@@ -19,39 +22,32 @@ public class GameManage : MonoBehaviour
     public AudioClip bgm_clip;
 
     public float bgm_volume = 0.12f;
-
     public AudioSource bgm_source;
 
     public PlayerControl Player;
+    public GameOver gameover;
 
     private void Start()
     {
         background = GameObject.Find("BG");//获取背景对象
         enemys = Resources.LoadAll<GameObject>("Enemys");//加载所有敌机预制体
-        InvokeRepeating("Create_Enemys", 0, 1.0f);
+        InvokeRepeating(nameof(Create_Enemys), 0, 1.0f);
 
         // 初始化并播放 BGM（如果已设置）
-        if (bgm_clip != null)
-        {
-            bgm_source = gameObject.AddComponent<AudioSource>();
-            bgm_source.clip = bgm_clip;
-            bgm_source.loop = true;
-            bgm_source.playOnAwake = false;
-            bgm_source.volume = bgm_volume;
-            bgm_source.Play();
-        }
+        bgm_source = gameObject.AddComponent<AudioSource>();
+        bgm_source.clip = bgm_clip;
+        bgm_source.loop = true;
+        bgm_source.playOnAwake = false;
+        bgm_source.volume = bgm_volume;
+        bgm_source.Play();
     }
 
     private void Update()
     {
         background.GetComponent<Renderer>().material.SetTextureOffset("_MainTex", new Vector2(0f, Time.time / bg_speed));
         score_txt.text = "Score: " + score.ToString();
-
-        if (Player != null)
-        {
-            hp_txt.text = "HP: " + Player.hp.ToString();
-            bulletnum_txt.text = Player.bullet_num.ToString();
-        }
+        hp_txt.text = "HP: " + Player.hp.ToString();
+        bulletnum_txt.text = Player.bullet_num.ToString();
         //ESC键暂停/继续游戏
     }
 
@@ -62,13 +58,9 @@ public class GameManage : MonoBehaviour
             new Vector3(Random.Range(-8f, 8f), 5.7f, 1.0f),
             Quaternion.identity
         );
-        enemy.AddComponent<EnemyAI>();//给敌机添加脚本组件
-        float speed = Random.Range(3.0f, 6.0f);
-        enemy.GetComponent<EnemyAI>().enemy_speed = speed;//速度
-        enemy.tag = "Enemy";
     }
 
-    public void Set_Score(int val)
+    public void Add_Score(int val)
     {
         score += val;
     }

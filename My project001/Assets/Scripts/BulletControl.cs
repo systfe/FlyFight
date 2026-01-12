@@ -6,28 +6,29 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class BulletControl : MonoBehaviour
 {
-    private float bullet_speed = 8.0f;//子弹速度
+    public float bullet_speed;//子弹速度
+    public float damage;//子弹伤害
 
-    private void Start()
+    protected void Start()
     {
         GetComponent<BoxCollider2D>().isTrigger = true;
         GetComponent<Rigidbody2D>().gravityScale = 0;
     }
 
-    private void Update()
+    protected void Update()
     {
         transform.Translate(Vector3.up * Time.deltaTime * bullet_speed);
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    protected void OnTriggerEnter2D(Collider2D other)
     {
         switch (other.tag)
         {
             case "Player":
                 if (this.name.Contains("Enemy-"))
                 {
-                    other.SendMessage("Damage", 20, SendMessageOptions.DontRequireReceiver);
-
+                    other.SendMessage("Damage", damage, SendMessageOptions.DontRequireReceiver);
+                    Hit_In();
                     Destroy(gameObject);
                 }
                 break;
@@ -36,11 +37,12 @@ public class BulletControl : MonoBehaviour
                 if (this.name.Contains("Player-"))
                 {
                     // 如果被击中的对象是敌机，并且被这次伤害击毁，则加分
-                    var enemy = other.GetComponent<EnemyAI>();//尝试获取敌机脚本组件
+                    var enemy = other.GetComponent<EnemyPlane>();//尝试获取敌机脚本组件
                     if (enemy != null)
                     {
-                        bool dead = enemy.Damage(20);
-                        if (dead) GameObject.Find("GameManage").SendMessage("Set_Score", 10, SendMessageOptions.DontRequireReceiver);
+                        bool dead = enemy.Damage(damage);
+                        Hit_In();
+                        if (dead) GameObject.Find("GameManage").SendMessage("Add_Score", enemy.enemy_score, SendMessageOptions.DontRequireReceiver);
                     }
 
                     Destroy(gameObject);
@@ -55,5 +57,9 @@ public class BulletControl : MonoBehaviour
                 if (this.name != other.name) Destroy(gameObject);
                 break;
         }
+    }
+
+    void Hit_In()
+    {
     }
 }

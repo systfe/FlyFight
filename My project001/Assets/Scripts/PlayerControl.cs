@@ -7,7 +7,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(BoxCollider2D))]//请求添加碰撞盒组件
 public class PlayerControl : Plane
 {
     public int bullet_num = 100;
@@ -30,8 +29,9 @@ public class PlayerControl : Plane
     protected new void Start()
     {
         fp_num = 3;
-        bullet_type = "BoobBullet";
-        name = "Player";
+        hp_max = 100f;
+        bullet_type = nameof(NormalBullet);
+        tag = "Player";
         base.Start();
 
         targetpos = transform.position;
@@ -101,15 +101,19 @@ public class PlayerControl : Plane
 
     private new void Attack()//普通攻击
     {
+        if (bullet_num < fp_num) return;
+
+        bullet_num -= fp_num;
         base.Attack();
         AudioSource.PlayClipAtPoint(clips, targetpos, 0.5f);//播放音效
     }
 
     private void RangeAttack()//大招（仅执行发射逻辑）
     {
-        if (bullet_num == 0) return;
-        int spread_angle = 160;
         int num = 10;
+        if (bullet_num < num) return;
+        bullet_num -= num;
+        int spread_angle = 160;
         float angle = spread_angle / (num - 1);
         for (int i = -num / 2; i < num / 2 + 1; i++)
         {
@@ -119,25 +123,21 @@ public class PlayerControl : Plane
         AudioSource.PlayClipAtPoint(clips, firepos[0].position, 1.0f);
     }
 
-    private GameObject Fire(Transform fp, int bn = -1)
-    {
-        bullet_num = (bullet_num > 0) ? bullet_num + bn : 0;
-        return base.Fire(fp);
-    }
-
     private void FBH()
-    { FlashBack(5, false); }
+    {
+        FlashBack(5, false);
+    }
 
     private void FlashBack(int v, bool effects = true)//回血
     {
-        hp = hp + v >= 100 ? 100 : hp + v;
+        hp = hp + v >= hp_max ? hp_max : hp + v;
         if (effects)
         {
             // 可以添加回血反馈效果，如闪烁等
         }
     }
 
-    public new bool Damage(int damage)//受到伤害
+    public new bool Damage(float damage)//受到伤害
     {
         bool die = base.Damage(damage);
         if (die)
